@@ -1,0 +1,165 @@
+-- [[ SHIRA FPS BOOST & OPTIMIZATION SCRIPT ]] --
+-- Tema: Hitam & Putih Minimalis
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local Title = Instance.new("TextLabel")
+local ToggleBtn = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+local StatusLabel = Instance.new("TextLabel")
+local UIStroke = Instance.new("UIStroke")
+local ButtonStroke = Instance.new("UIStroke")
+
+-- Mengatur UI agar tetap ada meskipun karakter reset
+ScreenGui.Name = "ShiraFPSBoostUI"
+ScreenGui.Parent = game:GetService("CoreGui") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Frame Utama (Tema Hitam)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Hitam Pekat
+MainFrame.Position = UDim2.new(0.05, 0, 0.4, 0)
+MainFrame.Size = UDim2.new(0, 220, 0, 150)
+MainFrame.Active = true
+MainFrame.Draggable = true 
+
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+-- Border Putih Tipis untuk Frame Utama
+UIStroke.Parent = MainFrame
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.Thickness = 1
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- Judul UI (SHIRA FPS BOOST)
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1.000
+Title.Position = UDim2.new(0, 0, 0.08, 0)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "SHIRA FPS BOOST"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255) -- Putih
+Title.TextSize = 14.000
+Title.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Tombol Toggle On/Off (Hitam-Putih)
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Parent = MainFrame
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Default Hitam (Off)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.38, 0)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0, 38)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "BOOST: OFF"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255) -- Teks Putih
+ToggleBtn.TextSize = 14.000
+
+UICorner_2.CornerRadius = UDim.new(0, 6)
+UICorner_2.Parent = ToggleBtn
+
+-- Border Putih untuk Tombol
+ButtonStroke.Parent = ToggleBtn
+ButtonStroke.Color = Color3.fromRGB(255, 255, 255)
+ButtonStroke.Thickness = 1
+
+-- Label Status
+StatusLabel.Name = "StatusLabel"
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1.000
+StatusLabel.Position = UDim2.new(0, 0, 0.72, 0)
+StatusLabel.Size = UDim2.new(1, 0, 0, 30)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.Text = "Status: Normal Graphics"
+StatusLabel.TextColor3 = Color3.fromRGB(160, 160, 160) -- Abu-abu terang
+StatusLabel.TextSize = 11.000
+
+-- [[ LOGIKA OPTIMASI & TOGGLE ]] --
+
+local _settings = settings()
+local isBoosting = false
+
+local originalMaterials = {}
+local lightingBackup = {
+    GlobalShadows = game.Lighting.GlobalShadows,
+    OutdoorAmbient = game.Lighting.OutdoorAmbient
+}
+
+local function ApplyFPSBoost()
+    game.Lighting.GlobalShadows = false
+    game.Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+    _settings.Network.IncomingReplicationLag = -1
+    
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") or v:IsA("WedgePart") then
+            if not originalMaterials[v] then
+                originalMaterials[v] = {
+                    Material = v.Material,
+                    Color = v.Color
+                }
+            end
+            v.Material = Enum.Material.SmoothPlastic
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 1 
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Sparkles") then
+            v.Enabled = false 
+        end
+    end
+end
+
+local function RevertGraphics()
+    game.Lighting.GlobalShadows = lightingBackup.GlobalShadows
+    game.Lighting.OutdoorAmbient = lightingBackup.OutdoorAmbient
+    
+    for part, props in pairs(originalMaterials) do
+        if part and part.Parent then
+            part.Material = props.Material
+        end
+    end
+    
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 0
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Sparkles") then
+            v.Enabled = true
+        end
+    end
+end
+
+-- Fungsi Klik Tombol dengan Transisi Tema
+ToggleBtn.MouseButton1Click:Connect(function()
+    isBoosting = not isBoosting
+    
+    if isBoosting then
+        -- Mode ON (Warna Berbalik: Putih dengan Teks Hitam)
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+        ToggleBtn.Text = "BOOST: ON"
+        StatusLabel.Text = "Status: Shira Mode Active"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        ApplyFPSBoost()
+    else
+        -- Mode OFF (Kembali ke Hitam dengan Teks Putih)
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleBtn.Text = "BOOST: OFF"
+        StatusLabel.Text = "Status: Normal Graphics"
+        StatusLabel.TextColor3 = Color3.fromRGB(160, 160, 160)
+        RevertGraphics()
+    end
+end)
+
+-- Otomatisasi Objek Baru
+game.DescendantAdded:Connect(function(v)
+    if isBoosting then
+        if v:IsA("Part") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") or v:IsA("WedgePart") then
+            v.Material = Enum.Material.SmoothPlastic
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 1
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Sparkles") then
+            v.Enabled = false
+        end
+    end
+end)
