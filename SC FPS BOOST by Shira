@@ -1,0 +1,175 @@
+-- [[ SHIRA FPS BOOST - PREMIUM DARK & WHITE EDITION ]] --
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIStroke = Instance.new("UIStroke")
+local Title = Instance.new("TextLabel")
+local SubTitle = Instance.new("TextLabel")
+local ToggleContainer = Instance.new("Frame")
+local ToggleCorner = Instance.new("UICorner")
+local ToggleStroke = Instance.new("UIStroke")
+local ToggleBtn = Instance.new("TextButton")
+local ButtonCorner = Instance.new("UICorner")
+local StatusLabel = Instance.new("TextLabel")
+
+-- Parent UI
+ScreenGui.Name = "ShiraPremiumUI"
+ScreenGui.Parent = game:GetService("CoreGui") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame (Matte Black Premium)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+MainFrame.Position = UDim2.new(0.05, 0, 0.4, 0)
+MainFrame.Size = UDim2.new(0, 240, 0, 160)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+UICorner.CornerRadius = UDim.new(0, 12) -- Lebih melengkung modern
+UICorner.Parent = MainFrame
+
+UIStroke.Parent = MainFrame
+UIStroke.Color = Color3.fromRGB(40, 40, 40) -- Border tipis elegan
+UIStroke.Thickness = 1
+
+-- Title (Bold & Clean)
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1.000
+Title.Position = UDim2.new(0, 15, 0, 12)
+Title.Size = UDim2.new(0, 210, 0, 20)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "SHIRA SYSTEM"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 14.000
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Subtitle / Version
+SubTitle.Name = "SubTitle"
+SubTitle.Parent = MainFrame
+SubTitle.BackgroundTransparency = 1.000
+SubTitle.Position = UDim2.new(0, 15, 0, 28)
+SubTitle.Size = UDim2.new(0, 210, 0, 15)
+SubTitle.Font = Enum.Font.Gotham
+SubTitle.Text = "Performance Optimizer v1.0"
+SubTitle.TextColor3 = Color3.fromRGB(100, 100, 100)
+SubTitle.TextSize = 10.000
+SubTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Container Luar Tombol (Gaya Cyberpunk/Minimalis)
+ToggleContainer.Name = "ToggleContainer"
+ToggleContainer.Parent = MainFrame
+ToggleContainer.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+ToggleContainer.Position = UDim2.new(0, 15, 0, 55)
+ToggleContainer.Size = UDim2.new(0, 210, 0, 45)
+
+ToggleCorner.CornerRadius = UDim.new(0, 8)
+ToggleCorner.Parent = ToggleContainer
+
+ToggleStroke.Parent = ToggleContainer
+ToggleStroke.Color = Color3.fromRGB(30, 30, 30)
+ToggleStroke.Thickness = 1
+
+-- Tombol Utama di Dalam Container
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Parent = ToggleContainer
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+ToggleBtn.Position = UDim2.new(0, 5, 0, 5)
+ToggleBtn.Size = UDim2.new(0, 200, 0, 35)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "INITIALIZE BOOST"
+ToggleBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+ToggleBtn.TextSize = 11.000
+
+ButtonCorner.CornerRadius = UDim.new(0, 6)
+ButtonCorner.Parent = ToggleBtn
+
+-- Label Status di Bagian Bawah
+StatusLabel.Name = "StatusLabel"
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1.000
+StatusLabel.Position = UDim2.new(0, 15, 0, 115)
+StatusLabel.Size = UDim2.new(0, 210, 0, 30)
+StatusLabel.Font = Enum.Font.Code
+StatusLabel.Text = "// STATUS: READY_TO_RUN"
+StatusLabel.TextColor3 = Color3.fromRGB(140, 140, 140)
+StatusLabel.TextSize = 10.000
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- [[ LOGIKA OPTIMASI ]] --
+
+local _settings = settings()
+local isBoosting = false
+local originalMaterials = {}
+local lightingBackup = {
+    GlobalShadows = game.Lighting.GlobalShadows,
+    OutdoorAmbient = game.Lighting.OutdoorAmbient
+}
+
+local function ApplyFPSBoost()
+    game.Lighting.GlobalShadows = false
+    game.Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+    _settings.Network.IncomingReplicationLag = -1
+    
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") or v:IsA("WedgePart") then
+            if not originalMaterials[v] then
+                originalMaterials[v] = { Material = v.Material }
+            end
+            v.Material = Enum.Material.SmoothPlastic
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 1 
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Sparkles") then
+            v.Enabled = false 
+        end
+    end
+end
+
+local function RevertGraphics()
+    game.Lighting.GlobalShadows = lightingBackup.GlobalShadows
+    game.Lighting.OutdoorAmbient = lightingBackup.OutdoorAmbient
+    
+    for part, props in pairs(originalMaterials) do
+        if part and part.Parent then part.Material = props.Material end
+    end
+    
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 0
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Sparkles") then v.Enabled = true end
+    end
+end
+
+-- Interaksi & Transisi Animasi Warna Ringan
+ToggleBtn.MouseButton1Click:Connect(function()
+    isBoosting = not isBoosting
+    
+    if isBoosting then
+        -- Efek Menyala Putih Bersih (Aktif)
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+        ToggleBtn.Text = "SYSTEM OPTIMIZED"
+        StatusLabel.Text = "// STATUS: ACTIVE_POTATO_MODE"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        UIStroke.Color = Color3.fromRGB(255, 255, 255) -- Border UI ikut menyala putih
+        ApplyFPSBoost()
+    else
+        -- Kembali ke Mode Gelap (Non-aktif)
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        ToggleBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+        ToggleBtn.Text = "INITIALIZE BOOST"
+        StatusLabel.Text = "// STATUS: READY_TO_RUN"
+        StatusLabel.TextColor3 = Color3.fromRGB(140, 140, 140)
+        UIStroke.Color = Color3.fromRGB(40, 40, 40)
+        RevertGraphics()
+    end
+end)
+
+game.DescendantAdded:Connect(function(v)
+    if isBoosting then
+        if v:IsA("Part") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") or v:IsA("WedgePart") then v.Material = Enum.Material.SmoothPlastic
+        elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Sparkles") then v.Enabled = false end
+    end
+end)
